@@ -1,5 +1,6 @@
 import requests
 from lxml import etree
+import time
 
 
 def main():
@@ -8,14 +9,16 @@ def main():
         html_code = etree.HTML(result.text)
         articles = html_code.xpath("//section[@class='row-full']")
         for article in articles:
+            time.sleep(3)
             title = article.xpath("./section/a[@class='article-title']/h2/text()")[0]
-            time = article.xpath("./section/div[@class='article-text-wrapper']/p/text()")[0]
-            time = time_format(time=time)
-            requests.post("127.0.0.1:8080/api/apple_news",data={"title": title, "time": time})
+            push_time = article.xpath("./section/div[@class='article-text-wrapper']/p/text()")[0]
+            push_time = time_format(time=push_time)
+            print(title, push_time)
+            response = requests.post("http://101.133.142.11:8080/api/apple_news",data={"title": title, "time": push_time})
+            print(response.status_code)
 
 def time_format(time):
     strlist = time.split(' ')
-    print(strlist)
     if 3 == len(strlist):
         month = strlist[0]
         months = {"January": "1",
